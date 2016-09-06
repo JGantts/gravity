@@ -41,13 +41,6 @@ class CelestialBody:
     diameter = 0
     color = "black"
 
-    def __init__(self, positionX, positionY, velocityX, velocityY, mass):
-        self.position = Vector(positionX, positionY)
-        self.velocity = Vector(velocityX, velocityY)
-        self.mass = mass
-        self.diameter = 10
-        self.color = "blue"
-
     def __init__(self, positionX, positionY, velocityX, velocityY, mass, diameter, color):
         self.position = Vector(positionX, positionY)
         self.velocity = Vector(velocityX, velocityY)
@@ -92,7 +85,7 @@ class CelestialBody:
         self.position = Vector.add(self.position, self.velocity)
 
 class World:
-    bodies = 0
+    bodies = NONE
 
     def __init__(self, bodies):
         self.bodies = bodies
@@ -144,8 +137,8 @@ class ResizingCanvas(Canvas):
         self.update()
 
 class ViewHandler:
-    canvas = 0
-    world = 0
+    canvas = NONE
+    world = NONE
     playing = NO
     speed = 4
 
@@ -155,9 +148,12 @@ class ViewHandler:
         self.canvas.windowScale = 1.0
         #self.world = world
 
-    def reset(self):
-        self.playing = NO
+    def resetWorld(self):
         self.setupEarthMoonSun()
+        #self.setupSquare()
+        self.canvas.updateWorld(self.world)
+
+    def resetView(self):
         self.speed = 4
         self.canvas.windowTopLeft = Vector(0, 0)
         self.canvas.windowScale = 1.0
@@ -165,8 +161,8 @@ class ViewHandler:
 
     def start(self):
         if(not self.playing):
-            if(self.world == 0):
-                self.reset()
+            if(self.world == NONE):
+                self.resetWorld()
             self.playing = YES
             self.beginPlaying()
 
@@ -241,7 +237,7 @@ class ViewHandler:
                 CelestialBody(500, 601, 1.1,    -0.01,  0.5,   5, "gray"), ]
         self.world = World(bodies)
 
-    def setupPlayingSquare(self):
+    def setupSquare(self):
         delta = 20
         min = 000
         max = 1000
@@ -293,9 +289,8 @@ class ViewHandler:
 class Application(Frame):
     def createWidgets(self):
         self.viewWindow = ResizingCanvas(self, bg="black", height=1600, width=1600, highlightthickness=0)
-        self.viewWindow.pack({"side": "top"}, fill=BOTH, expand=YES)        
-
         self.viewHandler = ViewHandler(self.viewWindow)
+        self.viewWindow.pack({"side": "top"}, fill=BOTH, expand=YES)
 
         self.QUIT = Button(self)
         self.QUIT["text"] = "QUIT"
@@ -303,18 +298,23 @@ class Application(Frame):
         self.QUIT["command"] =  self.quit
         self.QUIT.pack({"side": "left"})
 
-        self.RESET = Button(self)
-        self.RESET["text"] = "Reset",
-        self.RESET["command"] = self.viewHandler.reset
-        self.RESET.pack({"side": "left"})
+        self.RESET_WORLD = Button(self)
+        self.RESET_WORLD["text"] = "Reset World",
+        self.RESET_WORLD["command"] = self.viewHandler.resetWorld
+        self.RESET_WORLD.pack({"side": "left"})
+
+        self.RESET_VIEW = Button(self)
+        self.RESET_VIEW["text"] = "Reset View",
+        self.RESET_VIEW["command"] = self.viewHandler.resetView
+        self.RESET_VIEW.pack({"side": "left"})
 
         self.START = Button(self)
-        self.START["text"] = "Start",
+        self.START["text"] = "Play",
         self.START["command"] = self.viewHandler.start
         self.START.pack({"side": "left"})
 
         self.STOP = Button(self)
-        self.STOP["text"] = "Stop",
+        self.STOP["text"] = "Pause",
         self.STOP["command"] = self.viewHandler.stop
         self.STOP.pack({"side": "left"})
 
@@ -357,6 +357,10 @@ class Application(Frame):
         self.IN["text"] = "In",
         self.IN["command"] = self.viewHandler.zoomIn
         self.IN.pack({"side": "right"})
+
+
+
+
 
     def __init__(self, master=None):
         Frame.__init__(self, master)
