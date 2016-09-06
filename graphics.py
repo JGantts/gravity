@@ -149,7 +149,7 @@ class ViewHandler:
         #self.world = world
 
     def resetWorld(self):
-        self.setupEarthMoonSun()
+        self.setupSquare()
         #self.setupSquare()
         self.canvas.updateWorld(self.world)
 
@@ -224,7 +224,8 @@ class ViewHandler:
             return 0
 
     def beginPlaying(self):
-        self.world.tick()
+        for i in range(0, 1):
+            self.world.tick()
         self.canvas.updateWorld(self.world)
         #time.sleep(0.01)
         if(self.playing):
@@ -242,7 +243,9 @@ class ViewHandler:
         min = 000
         max = 1000
 
-        bodies = [None] * (((max-min)/delta)*4)
+        count = ((max-min)/delta)*4
+
+        bodies = [None] * (count)
         r = lambda: random.randint(127,255)
         g = lambda: random.randint(127,175)
         b = lambda: random.randint(0,64)
@@ -256,7 +259,8 @@ class ViewHandler:
         done = NO
         while( not done ):
             #print ("X: " + str(x) + " Y: " + str(y))
-            bodies[i] = CelestialBody(x, y, velX, velY, 1, 10, '#%02X%02X%02X' % (r(),g(),b()))
+            #bodies[i] = CelestialBody(x, y, velX, velY, 1, 10, '#%02X%02X%02X' % (r(),g(),b()))
+            bodies[i] = CelestialBody(x, y, velX, velY, 1, 10, '#%02X%02X%02X' % (255*(count-i)/count, 255*(count-i)/count, 255*i/count))
             i+=1
             if(x==min):
                 if(y!=max):
